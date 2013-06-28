@@ -1,11 +1,14 @@
-# pumpio-el
+This software will be divided into three level at first:
 
-Pumpio Client for Emacs
+* Interface
+* Control
+* HTTP connectivity
+
+Some people like to use the emacs url package, others want to use the curl program or another alternatives.
 
 # License
 
-
-    README.md
+    design.md
     Copyright (C) 2013  Giménez, Christian N.
 
     This program is free software: you can redistribute it and/or modify
@@ -22,5 +25,4 @@ Pumpio Client for Emacs
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     Viernes 28 De Junio Del 2013
-
 

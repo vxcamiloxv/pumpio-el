@@ -52,14 +52,18 @@
   (setq pmpio-get-note-hook 'pmpio-http-get-note)
   )
 
-(defun pmpio-http-get-note (uuid)
-  "Make a get request for the UUID."
+(defun pmpio-http-get-note (uuid fnc)
+  "Make a get request for the UUID.
+
+When the note is completely retrieved, I call the given function FNC.
+
+FNC has to recieve one parameter: the note loaded."
   
   (let ((url-request-extra-headers 
 	 '(("Accept-Charset" . "utf-8")))
 	(buffer-file-coding-system 'utf-8)
 	)
-    (oauth-url-retrieve pmpio-auth-token (pmpio-url-get-note uuid) 'pmpio-http-parse-note-callback)
+    (oauth-url-retrieve pmpio-auth-token (pmpio-url-get-note uuid) 'pmpio-http-parse-note-callback (list fnc))
     )  
   )
 
@@ -67,15 +71,27 @@
 
 					; Internal functions
 
-(defun pmpio-http-parse-note-callback (&rest status)  
+(defun pmpio-http-parse-note-callback (status fnc)
   (pmpio-http-delete-headers)
   
   ;; parse the json information
-  (let ((parsed (json-read)))
-    ;; (pmpio-note-new 
-    parsed
+  (let* ((parsed (json-read))
+	 (note     (make-pmpio-note 
+		    :uuid (cdr (assoc 'uuid parsed))
+		    :author (cdr (assoc 'preferredUsername (cdr (assoc 'author parsed))))
+		    :content (cdr (assoc 'content parsed))
+		    :published (cdr (assoc 'published parsed))
+		    :updated (cdr (assoc 'updated parsed))
+		    :url (cdr (assoc 'url parsed))
+		    ;; :comments ... 
+		    )
+		   )
+	 )
+    
+    (kill-buffer)
+    (funcall fnc note)
     )
-  )  
+  )
 
 (defun pmpio-http-register-client ()
   "Register the client dinamically."

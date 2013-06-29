@@ -32,7 +32,7 @@
 
 (provide 'pumpio-urls)
 
-(defvar pumpio-pod "http://microca.st"
+(defvar pumpio-pod "https://microca.st"
   "This is the pod where you have your account.")
 
 (defun pmpio-url-get-note (uuid)
@@ -43,6 +43,21 @@
 (defun pmpio-url-get-client-register ()
   "Return the URL string for getting the client registration URL."
   (concat pumpio-pod "/api/client/register")
+  )
+
+(defun pmpio-url-request ()
+  "Return the URL string for getting the OAuth request token."
+  (concat pumpio-pod "/oauth/request_token")
+  )
+
+(defun pmpio-url-authorize ()
+  "Return the URL string for authorize the OAuth request token."
+  (concat pumpio-pod "/oauth/authorize")
+  )
+
+(defun pmpio-url-access ()
+  "Return the URL string for turning the request token into an access token."
+  (concat pumpio-pod "/oauth/access_token")
   )
 
 ;;; pumpio-urls.el ends here

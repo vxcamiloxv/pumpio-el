@@ -34,7 +34,7 @@
 
 (require 'pumpio-comment)
 (require 'pumpio-note)
-;; (require 'pumpio-urls)
+(require 'pumpio-urls)
 
 (require 'url)
 (require 'json)
@@ -102,6 +102,13 @@ Gets the client secret and client id and stores it at the `pmpio-client-secret' 
     (setq pmpio-client-id (cdr (assoc 'client_id parsed)))	
     )
   (kill-buffer)
+
+  ;; Authorize
+  (oauth-authorize-app pmpio-client-id
+		       pmpio-client-secret 
+		       (pmpio-url-request)
+		       (pmpio-url-access)
+		       (pmpio-url-authorize))
   )
 
 (defun pmpio-http-delete-headers ()

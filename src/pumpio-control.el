@@ -45,7 +45,9 @@
 
 (defun pmpio-ctrl-get-note-callback (note)
   (with-current-buffer (get-buffer-create "PumpIO Note")
-    (pmpio-note-show note)
+    (delete-region (point-min) (point-max))
+    (pmpio-note-write note)
+    (switch-to-buffer-other-window (current-buffer))
     )		     
   )
 

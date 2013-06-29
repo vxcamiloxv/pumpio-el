@@ -50,14 +50,21 @@
 
 HTTP: This is the default and use the pumpio-http library, it calls the `pmpio-http-assign-functions' for setting all the hooks.")
 
-(defun pmpio-activate-functions (type)
+(defun pmpio-activate-functions (&optional type)
   "Use the stream functions using this TYPE of application.
 By default, if TYPE is nil or doesn't exists use http."
-
-  (if (assoc type pmpio-stream-types)
-      (funcall (cdr (assoc 'http pmpio-stream-types)))
-    (error "This type of connection doesn't exist!")
+  
+  (unless type 
+    ;; Using nil or parameter not given 
+    (set (make-local-variable 'type) 'http)
     )
+  (if (assoc type pmpio-stream-types)
+      (funcall (cdr (assoc type pmpio-stream-types)))
+    (progn ;; Type of connection not founded!... using default!
+      (message "Check the type of the connection. It doesn't exists! Using default: pumpio-http.el")
+      (funcall (cdr (assoc 'http pmpio-stream-types)))
+      )
+    )   
   )
 
 

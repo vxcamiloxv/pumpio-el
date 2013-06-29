@@ -43,6 +43,8 @@
   "Client id for oauth authentication. This will be automatically setted by `pmpio-http-register-client' and its callback.")
 (defvar pmpio-client-secret nil
   "Client secret for oauth authentication. This will be automatically setted by `pmpio-http-register-client' and its callback.")
+(defvar pmpio-auth-token nil
+  "Authorization token given by `oauth-authorize-app' when user has successfully finished the OAuth process.")
 
 (defun pmpio-http-assign-functions ()
   "Assign to the API the funcions needed for using pump-http."
@@ -57,23 +59,21 @@
 	 '(("Accept-Charset" . "utf-8")))
 	(buffer-file-coding-system 'utf-8)
 	)
-    (let ((buffer (url-retrieve (pmpio-url-get-note uuid) 'pmpio-http-parse-note))
-	  )
-      ;; (kill-buffer buffer)
-      )
-    )
+    (oauth-url-retrieve pmpio-auth-token (pmpio-url-get-note uuid) 'pmpio-http-parse-note-callback)
+    )  
   )
 
 
 
 					; Internal functions
 
-(defun pmpio-http-parse-note-callback (status)  
+(defun pmpio-http-parse-note-callback (&rest status)  
   (pmpio-http-delete-headers)
   
   ;; parse the json information
   (let ((parsed (json-read)))
     ;; (pmpio-note-new 
+    parsed
     )
   )  
 
@@ -104,11 +104,11 @@ Gets the client secret and client id and stores it at the `pmpio-client-secret' 
   (kill-buffer)
 
   ;; Authorize
-  (oauth-authorize-app pmpio-client-id
-		       pmpio-client-secret 
-		       (pmpio-url-request)
-		       (pmpio-url-access)
-		       (pmpio-url-authorize))
+  (setq pmpio-auth-token (oauth-authorize-app pmpio-client-id
+					      pmpio-client-secret 
+					      (pmpio-url-request)
+					      (pmpio-url-access)
+					      (pmpio-url-authorize)))
   )
 
 (defun pmpio-http-delete-headers ()

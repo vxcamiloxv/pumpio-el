@@ -34,8 +34,15 @@
 
 (require 'pumpio-comment)
 (require 'pumpio-note)
+;; (require 'pumpio-urls)
 
 (require 'url)
+(require 'json)
+
+(defvar pmpio-client-id nil
+  "Client id for oauth authentication. This will be automatically setted by `pmpio-http-register-client' and its callback.")
+(defvar pmpio-client-secret nil
+  "Client secret for oauth authentication. This will be automatically setted by `pmpio-http-register-client' and its callback.")
 
 (defun pmpio-http-assign-functions ()
   "Assign to the API the funcions needed for using pump-http."
@@ -69,5 +76,45 @@
     ;; (pmpio-note-new 
     )
   )  
+
+(defun pmpio-http-register-client ()
+  "Register the client dinamically."
+  
+  (let ((url-request-method "POST")
+	(url-request-extra-headers	 
+	 '(("Content-Type" . "application/json")
+	   ("Accept-Charset" . "utf-8"))
+	 )	  
+	(buffer-file-coding-system 'utf-8)
+	(url-request-data  "{ \"type\": \"client_associate\", \"application_name\": \"pumpio-el\", \"application_type\": \"native\" }")
+	)
+    (url-retrieve (pmpio-url-get-client-register) 'pmpio-http-process-registration-callback)  
+    )
+  )
+
+(defun pmpio-http-process-registration-callback (status)
+  "This is a callback function for `pmpio-http-register-client'.
+Gets the client secret and client id and stores it at the `pmpio-client-secret' and `pmpio-client-id' variables"
+  (pmpio-http-delete-headers)
+  (let ((parsed (json-read))
+	)
+    (setq pmpio-client-secret (cdr (assoc 'client_secret parsed)))
+    (setq pmpio-client-id (cdr (assoc 'client_id parsed)))	
+    )
+  (kill-buffer)
+  )
+
+(defun pmpio-http-delete-headers ()
+  "Delete all the HTTP headers in the current buffer."
+
+  (let ((ending (search-forward "\n\n" nil t))
+	)
+    (when ending
+      (delete-region (point-min) ending)
+      )
+    )  
+  )
+
+
 
 ;;; pumpio-http.el ends here

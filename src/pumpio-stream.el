@@ -39,7 +39,8 @@
 ;; See `pmpio-http-assign-functions'.
 ;;
 (defvar pmpio-get-note-hook nil)
-
+(defvar pmpio-register-hook nil)
+(defvar pmpio-is-register-p-hook nil)
 
 
 (defvar pmpio-stream-types '(
@@ -68,5 +69,24 @@ By default, if TYPE is nil or doesn't exists use http."
   (run-hook pmpio-get-note-hook)
   )
 
+(defun pmpio-register ()
+  "Register the client and wait for user authorization.
+
+Make the OAuth authentication!"
+  (unless pmpio-register-hook
+    (pmpio-activate-functions nil)
+    )
+  (run-hook pmpio-register-hook)
+  )
+
+(defun pmpio-is-registered-p ()
+  "Return t if this client is registered accordingly.
+
+If the client is not registered, you can use `pmpio-register'."
+  (unless pmpio-is-registered-p-hook
+    (pmpio-activate-functions nil)
+    )
+  (run-hook pmpio-is-registered-p-hook)
+  )
 
 ;;; pumpio-stream.el ends here

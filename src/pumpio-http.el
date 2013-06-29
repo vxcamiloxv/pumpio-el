@@ -48,7 +48,9 @@
 
 (defun pmpio-http-assign-functions ()
   "Assign to the API the funcions needed for using pump-http."
-  
+
+  (setq pmpio-is-registered-p-hook 'pmpio-http-is-registered-p)
+  (setq pmpio-register-hook 'pmpio-http-register-client)
   (setq pmpio-get-note-hook 'pmpio-http-get-note)
   )
 

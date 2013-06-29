@@ -66,7 +66,7 @@ By default, if TYPE is nil or doesn't exists use http."
   (unless pmpio-get-note-hook
     (pmpio-activate-functions nil)
     )
-  (run-hook-with-args pmpio-get-note-hook uuid fnc)
+  (run-hook-with-args 'pmpio-get-note-hook uuid fnc)
   )
 
 (defun pmpio-register ()
@@ -76,7 +76,8 @@ Make the OAuth authentication!"
   (unless pmpio-register-hook
     (pmpio-activate-functions nil)
     )
-  (run-hook-with-args pmpio-register-hook)
+  (message "Registering Pumpio-el...")
+  (run-hook-with-args 'pmpio-register-hook)
   )
 
 (defun pmpio-is-registered-p ()
@@ -86,7 +87,7 @@ If the client is not registered, you can use `pmpio-register'."
   (unless pmpio-is-registered-p-hook
     (pmpio-activate-functions nil)
     )
-  (run-hook-with-args pmpio-is-registered-p-hook)
+  (funcall pmpio-is-registered-p-hook)
   )
 
 ;;; pumpio-stream.el ends here

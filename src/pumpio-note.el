@@ -54,4 +54,13 @@
     )
   )
 
+(defun pmpio-note-write (note)
+  "Write in the current buffer the given NOTE."
+  (insert (format "\n%s at %s: \n%s" 
+		  (pmpio-note-author note)
+		  (pmpio-note-published note)
+		  (pmpio-note-content note)
+		  )
+	  )
+  )
 ;;; pumpio-message.el ends here

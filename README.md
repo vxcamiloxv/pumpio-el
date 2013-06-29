@@ -2,6 +2,22 @@
 
 Pumpio Client for Emacs
 
+# Requirements
+
+* [emacs-OAuth](https://github.com/psanford/emacs-oauth) 
+  * Rename or delete hmac-sha1.el from this proyect.
+* [hmac-sha1 from FLIM](https://github.com/wanderlust/flim) (Keep reading for explanations).
+* URL package. Comes by default with Emacs 24.
+* JSON package. Comes by default with Emacs 24.
+
+## Considerations With the OAuth Library
+
+OAuth protocol requires a hash for signatures and usually use HMAC-SHA1. Despite emacs-OAuth comes with its own hmac-sha1.el implementation, for some reason *doesn't work and you have to download another*.
+
+I used the FLIM implementation and works well. Until I solve this problem, download the FLIM library completely at the [wanderlust github group](https://github.com/wanderlust/flim) and install it.
+
+Please, erase or rename the hmac-sha1.el file that comes with emacs-OAuth, it won't work for connecting with pump.io.
+
 # License
 
 

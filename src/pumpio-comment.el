@@ -35,33 +35,8 @@
 (defconst pmpio-comment-objecttype "comment"
   "This is the objectType field" )
 
-(defconst pmpio-comment-elements '('uuid 'author 'content 'url 'updated 'published)
-  "This are the allowed elements that a comment can have.")
-
-(defun pmpio-comment-new (author content  &optional uuid url updated published)
-  "Create a new comment given the AUTHOR and CONTENT and return it."
-  
-  (let ((comment (make-hash-table))
-	)
-    (puthash 'uuid uuid comment)
-    (puthash 'author author comment)
-    (puthash 'content content comment)
-    (puthash 'url url comment)
-    (puthash 'updated updated comment)
-    (puthash 'published published comment)
-   
-    comment
-    )
-  )
-
-(defun pmpio-comment-get (elt comment)
-  "Return the ELT element from the comment.
-ELT can be one of the `pmpio-comment-elements' constants."
-  (if (member elt pmpio-comment-elements)
-      (gethash elt comment)
-    (error "Element doesn't exists!")
-    )
-  )
+(defstruct pmpio-comment 
+  uuid author content url updated published)
 
 
 ;;; pumpio-comment.el ends here

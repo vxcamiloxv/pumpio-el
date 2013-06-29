@@ -32,46 +32,26 @@
 
 (provide 'pumpio-note)
 
+(require 'cl)
+
+(require 'pumpio-comment)
+
 (defconst pmpio-note-objecttype "note"
   "This is the objectType field" )
 
-(defconst pmpio-note-elements '(uuid author content url updated published comments)
-  "This are the allowed elements that a note can have.")
-
-(defun pmpio-note-new (author content  &optional uuid url updated published)
-  "Create a new note given the AUTHOR and CONTENT and return it."
-  
-  (let ((note (make-hash-table))
-	)
-    (puthash 'uuid uuid note)
-    (puthash 'author author note)
-    (puthash 'content content note)
-    (puthash 'url url note)
-    (puthash 'updated updated note)
-    (puthash 'published published note)
-    (puthash 'comments nil note)
-    
-    note
-    )
-  )
-
-(defun pmpio-note-get (elt note)
-  "Return the ELT element from the note.
-ELT can be one of the `pmpio-note-elements' constants."
-  (if (member elt pmpio-note-elements)
-      (gethash elt note)
-    (error "Element doesn't exists!")
-    )
-  )
-
-
+(defstruct pmpio-note 
+  uuid author content url updated published comments)
 
 (defun pmpio-note-add-comment (note comment)
   "Add one COMMENT into the NOTE."
-  (let ((lst-com (gethash 'comments note))
-	)
-    (puthash 'comments (add-to-list 'lst-com comment t) note)
-    )  
+  (when (and 
+	 (pmpio-comment-p comment)
+	 (pmpio-note-p note))      
+    (let ((lst-com (pmpio-note-comments note))
+	  )
+      (setf (pmpio-note-comments note) (add-to-list 'lst-com comment t))
+      )  
+    )
   )
 
 ;;; pumpio-message.el ends here

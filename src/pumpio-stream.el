@@ -40,7 +40,7 @@
 ;;
 (defvar pmpio-get-note-hook nil)
 (defvar pmpio-register-hook nil)
-(defvar pmpio-is-register-p-hook nil)
+(defvar pmpio-is-registered-p-hook nil)
 
 
 (defvar pmpio-stream-types '(
@@ -61,12 +61,12 @@ By default, if TYPE is nil or doesn't exists use http."
   )
 
 
-(defun pmpio-get-note (uuid)
+(defun pmpio-get-note (uuid fnc)
   "Get the note."
   (unless pmpio-get-note-hook
     (pmpio-activate-functions nil)
     )
-  (run-hook pmpio-get-note-hook)
+  (run-hook-with-args pmpio-get-note-hook uuid fnc)
   )
 
 (defun pmpio-register ()
@@ -76,7 +76,7 @@ Make the OAuth authentication!"
   (unless pmpio-register-hook
     (pmpio-activate-functions nil)
     )
-  (run-hook pmpio-register-hook)
+  (run-hook-with-args pmpio-register-hook)
   )
 
 (defun pmpio-is-registered-p ()
@@ -86,7 +86,7 @@ If the client is not registered, you can use `pmpio-register'."
   (unless pmpio-is-registered-p-hook
     (pmpio-activate-functions nil)
     )
-  (run-hook pmpio-is-registered-p-hook)
+  (run-hook-with-args pmpio-is-registered-p-hook)
   )
 
 ;;; pumpio-stream.el ends here

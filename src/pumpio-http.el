@@ -38,6 +38,7 @@
 
 (require 'url)
 (require 'json)
+(require 'oauth)
 
 (defvar pmpio-client-id nil
   "Client id for oauth authentication. This will be automatically setted by `pmpio-http-register-client' and its callback.")
@@ -52,6 +53,13 @@
   (setq pmpio-is-registered-p-hook 'pmpio-http-is-registered-p)
   (setq pmpio-register-hook 'pmpio-http-register-client)
   (setq pmpio-get-note-hook 'pmpio-http-get-note)
+  )
+
+(defun pmpio-http-is-registered-p ()
+  "Return t if the OAuth authentication has been made."
+  (if pmpio-auth-token
+      t
+    nil)
   )
 
 (defun pmpio-http-get-note (uuid fnc)

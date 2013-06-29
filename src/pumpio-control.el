@@ -33,6 +33,7 @@
 (provide 'pumpio-control)
 
 (require 'pumpio-stream)
+(require 'pumpio-note)
 
 (defun pmpio-ctrl-get-note (uuid)
   (unless (pmpio-is-registered-p)

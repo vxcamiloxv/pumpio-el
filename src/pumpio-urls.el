@@ -60,4 +60,9 @@
   (concat pumpio-pod "/oauth/access_token")
   )
 
+(defun pmpio-url-get-major-feed (nickname)
+  "Return the URL string for retrieving the major feed of a user."
+  (concat pumpio-pod "/api/user/" nickname "/feed/major")
+  )
+
 ;;; pumpio-urls.el ends here

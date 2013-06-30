@@ -34,6 +34,7 @@
 
 (require 'pumpio-comment)
 (require 'pumpio-note)
+(require 'pumpio-activity)
 (require 'pumpio-urls)
 
 (require 'url)
@@ -77,8 +78,21 @@ FNC has to recieve one parameter: the note loaded."
     )  
   )
 
+(defun pmpio-http-get-major-feed (nickname fnc)
+  "Get the Major Feed for the user with this NICKNAME.
+
+FNC is the callback function and must have one parameter: the activity list"
+  (let ((url-request-extra-headers 
+	 '(("Accept-Charset" . "utf-8")))
+	(buffer-file-coding-system 'utf-8)
+	)
+    (oauth-url-retrieve pmpio-auth-token (pmpio-url-get-major-feed nickname) 'pmpio-http-get-major-feed-callback (list fnc))
+    )  
+  )
 
 
+
+					; ====================
 					; Internal functions
 
 (defun pmpio-http-parse-note-callback (status fnc)
@@ -100,6 +114,33 @@ FNC has to recieve one parameter: the note loaded."
     
     (kill-buffer)
     (funcall fnc note)
+    )
+  )
+
+(defun pmpio-http-get-major-feed-callback (status fnc)
+  (pmpio-http-delete-headers)
+  
+  ;; parse the json information
+  (let* ((parsed (json-read))
+	 (items (cdr (assoc 'items parsed))) 
+	 (amount (length items))
+	 (activities nil) ;; This is the result list we'll return!
+	 )
+    
+    ;; Gather each activity and create it.
+    (dotimes (index amount)
+      (let ((activity (aref a index)))
+	(add-to-list 'activities
+		     (make-pmpio-activity :actor (cdr (assoc 'preferredUsername (cdr (assoc 'actor activity))))
+					  :content (cdr (assoc 'content (cdr (assoc 'object activity))))
+					  :published (cdr (assoc 'published activity))
+					  :verb (cdr (assoc 'verb activity)))
+		     t)
+	)
+      )
+    
+    (kill-buffer)
+    (funcall fnc activities)
     )
   )
 

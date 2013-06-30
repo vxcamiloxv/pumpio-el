@@ -1,9 +1,9 @@
-;;; pumpio-control.el --- 
+;;; pumpio-activity.el --- 
 
 ;; Copyright 2013 Christian
 ;;
 ;; Author: cnngimenez@lavabit.com
-;; Version: $Id: pumpio-control.el,v 0.0 2013/06/29 06:34:45 cng Exp $
+;; Version: $Id: pumpio-activity.el,v 0.0 2013/06/30 06:15:43 cng Exp $
 ;; Keywords: 
 ;; X-URL: not distributed yet
 
@@ -26,35 +26,13 @@
 ;; 
 
 ;; Put this file into your load-path and the following into your ~/.emacs:
-;;   (require 'pumpio-control)
+;;   (require 'pumpio-activity)
 
 ;;; Code:
 
-(provide 'pumpio-control)
+(provide 'pumpio-activity)
 
-(require 'pumpio-stream)
-(require 'pumpio-note)
+(defstruct pmpio-activity
+  verb actor content updated published)
 
-(defun pmpio-ctrl-get-note (uuid)
-  "Get the note identified by its UUID.
-
-Ensure that this client is registered."
-  (unless (pmpio-is-registered-p)
-    (pmpio-register)
-    )
-  
-  (pmpio-get-note uuid 'pmpio-ctrl-get-note-callback)
-  )
-
-(defun pmpio-ctrl-get-note-callback (note)
-  "This is a callback function used when the note has been retrieved.
-
-It simply create or get the buffer and write down the note."
-  (with-current-buffer (get-buffer-create "PumpIO Note")
-    (delete-region (point-min) (point-max))
-    (pmpio-note-write note)
-    (switch-to-buffer-other-window (current-buffer))
-    )		     
-  )
-
-;;; pumpio-control.el ends here
+;;; pumpio-activity.el ends here

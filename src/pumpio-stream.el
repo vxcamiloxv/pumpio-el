@@ -41,6 +41,7 @@
 (defvar pmpio-get-note-hook nil)
 (defvar pmpio-register-hook nil)
 (defvar pmpio-is-registered-p-hook nil)
+(defvar pmpio-get-major-feed-hook nil)
 
 
 (defvar pmpio-stream-types '(
@@ -95,6 +96,16 @@ If the client is not registered, you can use `pmpio-register'."
     (pmpio-activate-functions nil)
     )
   (funcall pmpio-is-registered-p-hook)
+  )
+
+(defun pmpio-get-major-feed (nickname fnc)
+  "Get a user major feed.
+NICKNAME is the nickname of the owner of the major feed.
+FNC is a callback function with one parameter: the list of activities."
+  (unless pmpio-get-major-feed-hook
+    (pmpio-activate-functions nil)
+    )
+  (run-hook-with-args 'pmpio-get-major-feed-hook nickname fnc)
   )
 
 ;;; pumpio-stream.el ends here

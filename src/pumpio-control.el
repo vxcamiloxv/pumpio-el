@@ -57,4 +57,25 @@ It simply create or get the buffer and write down the note."
     )		     
   )
 
+(defun pmpio-ctrl-get-major-feed (nickname)
+  "Get the major feed for a user.
+
+Ensure that this client is registered."
+  (unless (pmpio-is-registered-p)
+    (pmpio-register)
+    )
+
+  (pmpio-get-major-feed nickname 'pmpio-ctrl-get-major-feed-callback)
+  )
+
+(defun pmpio-ctrl-get-major-feed-callback (activities)
+  "Callback function for `pmpio-ctrl-get-major-feed'."
+  (with-current-buffer (get-buffer-create "PumpIO Note")
+    (delete-region (point-min) (point-max))
+    (dolist (act activities)
+      (pmpio-write-activity act)
+      )
+    (switch-to-buffer-other-window (current-buffer))
+    )		     
+  )
 ;;; pumpio-control.el ends here

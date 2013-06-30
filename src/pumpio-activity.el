@@ -35,4 +35,13 @@
 (defstruct pmpio-activity
   verb actor content updated published)
 
+(defun pmpio-write-activity (activity)
+  "Write in the current buffer a formatted ACTIVITY text."
+  (insert (format "\n%s at %s %s: \n%s\n" 
+		  (pmpio-activity-actor activity)
+		  (pmpio-activity-published activity)
+		  (pmpio-activity-verb activity)
+		  (pmpio-activity-content activity)))	  
+  )
+
 ;;; pumpio-activity.el ends here

@@ -130,13 +130,13 @@ FNC is the callback function and must have one parameter: the activity list"
     
     ;; Gather each activity and create it.
     (dotimes (index amount)
-      (let ((activity (aref a index)))
+      (let ((activity (aref items index)))
 	(add-to-list 'activities
 		     (make-pmpio-activity :actor (cdr (assoc 'preferredUsername (cdr (assoc 'actor activity))))
 					  :content (cdr (assoc 'content (cdr (assoc 'object activity))))
 					  :published (cdr (assoc 'published activity))
 					  :verb (cdr (assoc 'verb activity)))
-		     t)
+		     )
 	)
       )
     

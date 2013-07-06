@@ -34,6 +34,7 @@
 
 (require 'pumpio-stream)
 (require 'pumpio-note)
+(require 'pumpio-post-mode)
 
 
 (defconst pumpio-buffer "PumpIO"
@@ -110,7 +111,8 @@ This list can have these type of elements:
   "Create a new buffer for writing a note"
   (with-current-buffer (get-buffer-create pmpio-ctrl-post-buffer-name)
     
-    ;; (pumpio-post-mode)
+    (pumpio-post-mode)
+
     (switch-to-buffer-other-window (current-buffer))
     (fit-window-to-buffer (selected-window) 10 10)
     )

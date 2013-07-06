@@ -59,6 +59,7 @@
   (setq pmpio-register-hook 'pmpio-http-register-client)
   (setq pmpio-get-note-hook 'pmpio-http-get-note)
   (setq pmpio-get-major-feed-hook 'pmpio-http-get-major-feed)
+  (setq pmpio-post-note-hook 'pmpio-http-post-note)
   )
 
 (defun pmpio-http-is-registered-p ()
@@ -98,8 +99,8 @@ FNC has to recieve one parameter: the note loaded."
     )  
   )
 
-(defun pmpio-http-get-major-feed (fnc)
-  "Get the Major Feed for the user.
+(defun pmpio-http-get-major-feed (nickname fnc)
+  "Get the Major Feed for the user with NICKNAME.
 
 FNC is the callback function and must have one parameter: the activity list"
   (let ((url-request-extra-headers 
@@ -107,7 +108,7 @@ FNC is the callback function and must have one parameter: the activity list"
 	(buffer-file-coding-system 'utf-8)
 	)
     (oauth-url-retrieve pmpio-auth-token 
-			(pmpio-url-get-major-feed (pmpio-user-preferredUsername pmpio-http-user-data))
+			(pmpio-url-get-major-feed nickname)
 			'pmpio-http-get-major-feed-callback (list fnc))
     )  
   )

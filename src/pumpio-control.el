@@ -42,6 +42,9 @@
 By convenience, we like to use only one buffer for everything."
   )
 
+(defconst pmpio-ctrl-post-buffer-name "PumpIO New Note"
+  "This is the PumpIO Buffer name for creating a new note.")
+
 (defun pmpio-ctrl-get-note (uuid)
   "Get the note identified by its UUID.
 
@@ -105,21 +108,40 @@ This list can have these type of elements:
 
 (defun pmpio-ctrl-post-note ()
   "Create a new buffer for writing a note"
-  (with-current-buffer (get-buffer-create pmpio-ctrl-post-buffer)
+  (with-current-buffer (get-buffer-create pmpio-ctrl-post-buffer-name)
     
     ;; (pumpio-post-mode)
     (switch-to-buffer-other-window (current-buffer))
+    (fit-window-to-buffer (selected-window) 10 10)
     )
   )
 
-(defun pmpio-ctrl-post-current-buffer ()
-  "Send a note to the server."
-  (unless (pmpio-is-registered-p)
-    (pmpio-register)
+(defun pmpio-ctrl-post-current-buffer (&optional kill-buffer)
+  (pmpio-ctrl-post-buffer (current-buffer) kill-buffer)
+  )
+
+(defun pmpio-ctrl-post-buffer (buffer &optional kill-buffer)
+  "Send a note to the server.
+
+If KILL-BUFFER is t, then the current buffer will be killed after the note is posted."
+  (when (get-buffer buffer)
+    (unless (pmpio-is-registered-p)
+      (pmpio-register)
+      )
+    
+    (with-current-buffer buffer
+      (pmpio-post-note (make-pmpio-note :content (buffer-string)) 'pmpio-ctrl-post-callback)
+      
+      (when kill-buffer
+	(kill-buffer)
+	)
+      )
     )
-   
-  (pmpio-post-note pumpio-username
-   (make-pmpio-note :content (buffer-string))
+  )
+
+(defun pmpio-ctrl-post-callback (post-data)
+  "This is a callback function for `pmpio-ctrl-post-current-buffer'."
+  (message "Note posted! :-)")
   )
 
 ;;; pumpio-control.el ends here

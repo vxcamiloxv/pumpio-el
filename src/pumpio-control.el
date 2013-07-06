@@ -35,6 +35,7 @@
 (require 'pumpio-stream)
 (require 'pumpio-note)
 
+
 (defconst pumpio-buffer "PumpIO"
   "This is the PumpIO Buffer name.
 
@@ -84,4 +85,41 @@ Ensure that this client is registered."
     (switch-to-buffer-other-window (current-buffer))
     )		     
   )
+
+
+					; Posting feature
+
+(defvar pmpio-ctrl-selected-to nil
+  "This variable has a list of people selected for completing the To field. In other words, these are the intended receptors of the message.
+
+Is intended for temporary use, as soon as the post is sended correctly this variable will be cleaned.
+
+This list can have these type of elements:
+
+- string with the account address like \"acct:alice@microca.st\".
+- symbol with the collection name like 'public or 'followers. See `pmpio-url-collections' variable.
+")
+
+(defvar pmpio-ctrl-selected-cc nil
+  "Idem as `pmpio-ctrl-selected-to' but for carbon copy messages.")
+
+(defun pmpio-ctrl-post-note ()
+  "Create a new buffer for writing a note"
+  (with-current-buffer (get-buffer-create pmpio-ctrl-post-buffer)
+    
+    ;; (pumpio-post-mode)
+    (switch-to-buffer-other-window (current-buffer))
+    )
+  )
+
+(defun pmpio-ctrl-post-current-buffer ()
+  "Send a note to the server."
+  (unless (pmpio-is-registered-p)
+    (pmpio-register)
+    )
+   
+  (pmpio-post-note pumpio-username
+   (make-pmpio-note :content (buffer-string))
+  )
+
 ;;; pumpio-control.el ends here

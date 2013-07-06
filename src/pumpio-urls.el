@@ -89,5 +89,8 @@ COL-NAME is a symbol and can be one in the `pmpio-url-collections' alist"
 
 
 
+(defun pmpio-url-whoami ()
+  "Return the whoami URL."
+  (concat pumpio-pod "/api/whoami"))
 
 ;;; pumpio-urls.el ends here

@@ -1,3 +1,4 @@
+
 ;;; pumpio-note.el --- 
 
 ;; Copyright 2013 Christian
@@ -153,6 +154,6 @@ See `pmpio-url-collections' for more collection names.
       (list (cons 'objectType "collection")
 	    (cons 'id (pmpio-url-of-collection lst-dest))))
      )
-    )))
+    ))
 
 ;;; pumpio-message.el ends here

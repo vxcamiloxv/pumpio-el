@@ -34,6 +34,7 @@
 
 (require 'pumpio-comment)
 (require 'pumpio-note)
+(require 'pumpio-user)
 (require 'pumpio-activity)
 (require 'pumpio-urls)
 
@@ -62,6 +63,21 @@
   (if pmpio-auth-token
       t
     nil)
+  )
+
+(defun pmpio-http-register-client ()
+  "Register the client dinamically."
+  
+  (let ((url-request-method "POST")
+	(url-request-extra-headers	 
+	 '(("Content-Type" . "application/json")
+	   ("Accept-Charset" . "utf-8"))
+	 )	  
+	(buffer-file-coding-system 'utf-8)
+	(url-request-data  "{ \"type\": \"client_associate\", \"application_name\": \"pumpio-el\", \"application_type\": \"native\" }")
+	)
+    (url-retrieve (pmpio-url-get-client-register) 'pmpio-http-process-registration-callback)  
+    )
   )
 
 (defun pmpio-http-get-note (uuid fnc)
@@ -124,11 +140,65 @@ Example:
   )
 
 
-
+(defun pmpio-http-whoami (fnc-callback)
+  "Retrieve all personal information. After that, call FNC-CALLBACK with one parameter: a user structure."
+  (let ((url-request-extra-headers 
+	 '(("Accept-Charset" . "utf-8")))
+	(buffer-file-coding-system 'utf-8)
+	)
+    (oauth-url-retrieve pmpio-auth-token (pmpio-url-whoami) 'pmpio-http-whoami-callback (list fnc-callback))
+    )    
+  )
 
 
 					; ====================
 					; Internal functions
+
+(defun pmpio-http-whoami-2 (url fnc-callback)
+  "In case of error 302(temporary moved error), we use this function to get the new URL and parse the JSON."
+
+  (message (concat "Redirecting to " url))
+
+  (let ((url-request-extra-headers 
+	 '(("Accept-Charset" . "utf-8")))
+	(buffer-file-coding-system 'utf-8)
+	)
+    (oauth-url-retrieve pmpio-auth-token url 'pmpio-http-whoami-callback-2 (list fnc-callback))
+    )    
+  )
+
+(defun pmpio-http-whoami-callback (status fnc)
+  "Callback function used for `pmpio-http-whoami'."
+  (let ((err-number  (pmpio-http-get-number))
+	)
+    (if (or (equal 302 err-number) ;; HTTP Redirection?
+	    (equal 400 err-number) ;; Invalid signature or bad request?
+	    )
+	(pmpio-http-whoami-2 (plist-get status :redirect) fnc)
+      (pmpio-http-whoami-callback-2 status fnc)
+      ))
+  )
+
+(defun pmpio-http-whoami-callback-2 (status fnc)
+  (pmpio-http-delete-headers)
+  
+  (let* ((parsed (json-read))
+	 (user (make-pmpio-user
+		:preferredUsername (cdr (assoc 'preferredUsername parsed))
+		:displayName (cdr (assoc 'displayName parsed))
+		:summary (cdr (assoc 'summary parsed))
+		:updated (cdr (assoc 'updated parsed))
+		:id (cdr (assoc 'id parsed))
+		:url (cdr (assoc 'url parsed))
+		)
+	       )
+	 )
+    (kill-buffer)
+    (funcall fnc user)
+    )    
+  )
+
+
 
 (defun pmpio-http-post-note-callback (status fnc)
   "Callback function used for `pmpio-http-post-note'."
@@ -200,21 +270,6 @@ Example:
     )
   )
 
-(defun pmpio-http-register-client ()
-  "Register the client dinamically."
-  
-  (let ((url-request-method "POST")
-	(url-request-extra-headers	 
-	 '(("Content-Type" . "application/json")
-	   ("Accept-Charset" . "utf-8"))
-	 )	  
-	(buffer-file-coding-system 'utf-8)
-	(url-request-data  "{ \"type\": \"client_associate\", \"application_name\": \"pumpio-el\", \"application_type\": \"native\" }")
-	)
-    (url-retrieve (pmpio-url-get-client-register) 'pmpio-http-process-registration-callback)  
-    )
-  )
-
 (defun pmpio-http-process-registration-callback (status)
   "This is a callback function for `pmpio-http-register-client'.
 Gets the client secret and client id and stores it at the `pmpio-client-secret' and `pmpio-client-id' variables"
@@ -247,5 +302,36 @@ Gets the client secret and client id and stores it at the `pmpio-client-secret' 
   )
 
 
+(defun pmpio-http-get-number ()
+  "Get the HTTP number header in the current buffer."
+  (goto-char (point-min))
+  
+  (let ((num-pos (search-forward " " nil t))
+	(num nil)
+	)
+    (unless num-pos
+      (error "HTTP error number not found!"))
+    
+    (goto-char num-pos)
 
+    (string-to-number (buffer-substring (point) (search-forward " " nil t)))
+    )
+  )
+
+(defun pmpio-http-get-field (field)
+  "Get from the HTTP header the FIELD value in the current buffer."
+  (goto-char (point-min))
+  
+  (let* ((case-fold-search t)
+	 (data-pos (search-forward (concat field ": ") nil t))
+	 (data nil)
+	 )
+    (unless data-pos
+      (error "HTTP error number not found!"))
+    
+    (goto-char (match-end 0))
+
+    (buffer-substring (point)(point-at-eol))
+    )
+  )
 ;;; pumpio-http.el ends here

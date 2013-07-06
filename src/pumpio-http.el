@@ -49,6 +49,9 @@
 (defvar pmpio-auth-token nil
   "Authorization token given by `oauth-authorize-app' when user has successfully finished the OAuth process.")
 
+(defvar pmpio-http-user-data nil
+  "User data abstraction created with `make-pmpio-user'. This variable is filled using the function `pmpio-http-store-whoami'.")
+
 (defun pmpio-http-assign-functions ()
   "Assign to the API the funcions needed for using pump-http."
 
@@ -287,7 +290,15 @@ Gets the client secret and client id and stores it at the `pmpio-client-secret' 
 					      (pmpio-url-request)
 					      (pmpio-url-access)
 					      (pmpio-url-authorize)))
+  ;; Get the user information
+  (pmpio-http-whoami 'pmpio-http-store-whoami)
+  )
 
+(defun pmpio-http-store-whoami (user-data)
+  "Store the USER-DATA abstraction into `pmpio-http-user-data' for later use.
+
+USER-DATA has information needed like the username for creating the URLs."
+  (setq pmpio-http-user-data user-data)
   )
 
 (defun pmpio-http-delete-headers ()

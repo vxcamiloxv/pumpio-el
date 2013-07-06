@@ -98,24 +98,25 @@ FNC has to recieve one parameter: the note loaded."
     )  
   )
 
-(defun pmpio-http-get-major-feed (nickname fnc)
-  "Get the Major Feed for the user with this NICKNAME.
+(defun pmpio-http-get-major-feed (fnc)
+  "Get the Major Feed for the user.
 
 FNC is the callback function and must have one parameter: the activity list"
   (let ((url-request-extra-headers 
 	 '(("Accept-Charset" . "utf-8")))
 	(buffer-file-coding-system 'utf-8)
 	)
-    (oauth-url-retrieve pmpio-auth-token (pmpio-url-get-major-feed nickname) 'pmpio-http-get-major-feed-callback (list fnc))
+    (oauth-url-retrieve pmpio-auth-token 
+			(pmpio-url-get-major-feed (pmpio-user-preferredUsername pmpio-http-user-data))
+			'pmpio-http-get-major-feed-callback (list fnc))
     )  
   )
 
-(defun pmpio-http-post-note (nickname note fnc &optional to cc)
+(defun pmpio-http-post-note (note fnc &optional to cc)
   "Post a new note to your Pump.io profile.
 
 NOTE is a note created with `make-pmpio-note'.
 FNC is a callback function with one argument, the note given as an answer from the server.
-NICKNAME the sender nickname.
 TO can be a string, a symbol, or a list mixing this two types. It contains the account ids or collection names as symbols.
 CC analogous of TO.
 
@@ -124,7 +125,7 @@ If CC is not present or nil, then 'followers will be used.
 
 Example:
 
-  (pmpio-http-post-note \"my-nickname\"
+  (pmpio-http-post-note 
                         (make-pmpio-note :content \"Hi world!!! :-P\")
                         'my-callback-function
 			'(\"acct:alice@microca.st\" \"acct:bob@pumpio.net\" public followers))
@@ -135,10 +136,14 @@ Example:
 	 '(("Accept-Charset" . "utf-8")
 	   ("Content-Type" . "application/json")))
 	(url-request-data
-	 (pmpio-note-as-activity-json note to cc))
+	 (pmpio-note-as-activity-json (pmpio-user-preferredUsername pmpio-http-user-data)
+				      note to cc))
 	(buffer-file-coding-system 'utf-8)
 	)
-    (oauth-url-retrieve pmpio-auth-token (pmpio-url-post-note nickname) 'pmpio-http-post-note-callback (list fnc))
+    (oauth-url-retrieve pmpio-auth-token
+			(pmpio-url-post-note (pmpio-user-preferredUsername pmpio-http-user-data))
+			'pmpio-http-post-note-callback
+			(list fnc))
     )  
   )
 

@@ -73,9 +73,10 @@
 	 (cons 'content (pmpio-note-content note))))
   )
 
-(defun pmpio-note-as-activity-json (note &optional to cc)
+(defun pmpio-note-as-activity-json (nickname note &optional to cc)
   "Same as `pmpio-note-json' but considering this as an activity.
 
+NICKNAME is the sender username.
 If TO is nil or not setted, the public collection will be used.
 If CC is nil or not setted, the followers collection will be used.
 
@@ -93,14 +94,14 @@ Example:
 	       )
 	 (cons 'to 
 	       (if to
-		   (pmpio-note-construct-destinataries to)
-		 (pmpio-note-construct-destinataries 'public)
+		   (pmpio-note-construct-destinataries nickname to)
+		 (pmpio-note-construct-destinataries nickname 'public)
 		 )
 	       )
 	 (cons 'cc	       
 	       (if cc
-		   (pmpio-note-construct-destinataries cc)
-		 (pmpio-note-construct-destinataries 'followers)
+		   (pmpio-note-construct-destinataries nickname cc)
+		 (pmpio-note-construct-destinataries nickname 'followers)
 		 )
 	       )
 	 )
@@ -108,7 +109,7 @@ Example:
   )
 
 
-(defun pmpio-note-construct-destinataries (lst-dest)
+(defun pmpio-note-construct-destinataries (nickname lst-dest)
   "
 Returns a vector of people ready for JSON encode.
 
@@ -142,7 +143,7 @@ See `pmpio-url-collections' for more collection names.
 		    (vector (list (cons 'objectType "person")
 				  (cons 'id elt)))
 		  (vector (list (cons 'objectType "collection")
-				(cons 'id (pmpio-url-of-collection elt))))))
+				(cons 'id (pmpio-url-of-collection nickname elt))))))
 	       )
 	 )
        res
@@ -152,7 +153,7 @@ See `pmpio-url-collections' for more collection names.
     ((symbolp lst-dest) ;; Just one symbol
      (vector
       (list (cons 'objectType "collection")
-	    (cons 'id (pmpio-url-of-collection lst-dest))))
+	    (cons 'id (pmpio-url-of-collection nickname lst-dest))))
      )
     ))
 

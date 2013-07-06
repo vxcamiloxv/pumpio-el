@@ -35,6 +35,12 @@
 (require 'pumpio-stream)
 (require 'pumpio-note)
 
+(defconst pumpio-buffer "PumpIO"
+  "This is the PumpIO Buffer name.
+
+By convenience, we like to use only one buffer for everything."
+  )
+
 (defun pmpio-ctrl-get-note (uuid)
   "Get the note identified by its UUID.
 
@@ -50,7 +56,7 @@ Ensure that this client is registered."
   "This is a callback function used when the note has been retrieved.
 
 It simply create or get the buffer and write down the note."
-  (with-current-buffer (get-buffer-create "PumpIO Note")
+  (with-current-buffer (get-buffer-create pumpio-buffer)
     (delete-region (point-min) (point-max))
     (pmpio-note-write note)
     (switch-to-buffer-other-window (current-buffer))
@@ -70,7 +76,7 @@ Ensure that this client is registered."
 
 (defun pmpio-ctrl-get-major-feed-callback (activities)
   "Callback function for `pmpio-ctrl-get-major-feed'."
-  (with-current-buffer (get-buffer-create "PumpIO Note")
+  (with-current-buffer (get-buffer-create pumpio-buffer)
     (delete-region (point-min) (point-max))
     (dolist (act activities)
       (pmpio-write-activity act)

@@ -91,10 +91,65 @@ FNC is the callback function and must have one parameter: the activity list"
     )  
   )
 
+(defun pmpio-http-post-note (nickname note fnc &optional to cc)
+  "Post a new note to your Pump.io profile.
+
+NOTE is a note created with `make-pmpio-note'.
+FNC is a callback function with one argument, the note given as an answer from the server.
+NICKNAME the sender nickname.
+TO can be a string, a symbol, or a list mixing this two types. It contains the account ids or collection names as symbols.
+CC analogous of TO.
+
+If TO is not present or nil, then 'public will be used.
+If CC is not present or nil, then 'followers will be used.
+
+Example:
+
+  (pmpio-http-post-note \"my-nickname\"
+                        (make-pmpio-note :content \"Hi world!!! :-P\")
+                        'my-callback-function
+			'(\"acct:alice@microca.st\" \"acct:bob@pumpio.net\" public followers))
+"
+  
+  (let ((url-request-method "POST")
+	(url-request-extra-headers 
+	 '(("Accept-Charset" . "utf-8")
+	   ("Content-Type" . "application/json")))
+	(url-request-data
+	 (pmpio-note-as-activity-json note to cc))
+	(buffer-file-coding-system 'utf-8)
+	)
+    (oauth-url-retrieve pmpio-auth-token (pmpio-url-post-note nickname) 'pmpio-http-post-note-callback (list fnc))
+    )  
+  )
+
+
+
 
 
 					; ====================
 					; Internal functions
+
+(defun pmpio-http-post-note-callback (status fnc)
+  "Callback function used for `pmpio-http-post-note'."
+  (pmpio-http-delete-headers)
+
+  (let* ((parsed (json-read))
+	 (note     (make-pmpio-note 
+		    :uuid (cdr (assoc 'uuid parsed))
+		    :author (cdr (assoc 'preferredUsername (cdr (assoc 'author parsed))))
+		    :content (cdr (assoc 'content parsed))
+		    :published (cdr (assoc 'published parsed))
+		    :updated (cdr (assoc 'updated parsed))
+		    :url (cdr (assoc 'url parsed))
+		    ;; :comments ... 
+		    )
+		   )
+	 )
+    (kill-buffer)
+    (funcall fnc note)
+    )
+  )
 
 (defun pmpio-http-parse-note-callback (status fnc)
   (pmpio-http-delete-headers)
@@ -177,6 +232,7 @@ Gets the client secret and client id and stores it at the `pmpio-client-secret' 
 					      (pmpio-url-request)
 					      (pmpio-url-access)
 					      (pmpio-url-authorize)))
+
   )
 
 (defun pmpio-http-delete-headers ()

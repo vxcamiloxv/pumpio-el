@@ -65,4 +65,25 @@
   (concat pumpio-pod "/api/user/" nickname "/feed/major")
   )
 
+(defun pmpio-url-post-note (nickname)
+  "Return the URL string for posting a new note to the user feed."
+  (concat pumpio-pod "/api/user/" nickname "/feed")
+  )
+  
+
+(defvar pmpio-url-collections '(
+				 (public . "http://activityschema.org/collection/public")
+				 (followers . "https://microca.st/api/user/cnngimenez/followers")
+				 )
+  "This variable is used for mappint the collections name with its URL."
+  )
+
+(defun pmpio-url-of-collection (col-name)
+  "Return the URL of the collection name. 
+COL-NAME is a symbol and can be one in the `pmpio-url-collections' alist"  
+  (cdr (assoc col-name pmpio-url-collections)))
+
+
+
+
 ;;; pumpio-urls.el ends here

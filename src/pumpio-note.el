@@ -33,6 +33,7 @@
 (provide 'pumpio-note)
 
 (require 'cl)
+(require 'json)
 
 (require 'pumpio-comment)
 
@@ -63,4 +64,95 @@
 		  )
 	  )
   )
+
+(defun pmpio-note-json (note)
+  "Translate this NOTE abstraction into a JSON string."
+  (json-encode 
+   (list (cons 'objectType pmpio-note-objecttype)
+	 (cons 'content (pmpio-note-content note))))
+  )
+
+(defun pmpio-note-as-activity-json (note &optional to cc)
+  "Same as `pmpio-note-json' but considering this as an activity.
+
+If TO is nil or not setted, the public collection will be used.
+If CC is nil or not setted, the followers collection will be used.
+
+Example:
+
+  (pmpio-note-as-activity-json (make-pmpio-note :content \"Hi world!!! :-P\")
+			       '(\"acct:alice@microca.st\" \"acct:bob@pumpio.net\" 'public 'followers)) 
+"
+
+  (json-encode
+   (list (cons 'verb "post")
+	 (cons 'object (list
+			(cons 'objectType "note")
+			(cons 'content (pmpio-note-content note)))
+	       )
+	 (cons 'to 
+	       (if to
+		   (pmpio-note-construct-destinataries to)
+		 (pmpio-note-construct-destinataries 'public)
+		 )
+	       )
+	 (cons 'cc	       
+	       (if cc
+		   (pmpio-note-construct-destinataries cc)
+		 (pmpio-note-construct-destinataries 'followers)
+		 )
+	       )
+	 )
+   )
+  )
+
+
+(defun pmpio-note-construct-destinataries (lst-dest)
+  "
+Returns a vector of people ready for JSON encode.
+
+LST-DEST can be:
+- A string with the account address.
+- A list of string with accounts address.
+- A list of string with accounts address and collection names as symbols.
+- A symbol with as representation of a collection name.
+
+Collection names are symbols and can be one of the following:
+
+- 'followers
+- 'public
+
+See `pmpio-url-collections' for more collection names.
+"
+  (cond
+   ((stringp lst-dest) ;; Is a string
+    (vector 
+     (list (cons 'objectType "person")
+	   (cons 'id lst-dest)))
+    )
+   
+    ((listp lst-dest) ;; Is a mixed list of string or symbols
+     (let ((res []))
+       (dolist (elt lst-dest)
+	 (setq res
+	       (vconcat
+		res
+		(if (stringp elt)
+		    (vector (list (cons 'objectType "person")
+				  (cons 'id elt)))
+		  (vector (list (cons 'objectType "collection")
+				(cons 'id (pmpio-url-of-collection elt))))))
+	       )
+	 )
+       res
+       )
+     )
+     
+    ((symbolp lst-dest) ;; Just one symbol
+     (vector
+      (list (cons 'objectType "collection")
+	    (cons 'id (pmpio-url-of-collection lst-dest))))
+     )
+    )))
+
 ;;; pumpio-message.el ends here

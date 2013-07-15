@@ -60,4 +60,25 @@ This command is intended as a second step for `pumpio-new-note'."
   (pmpio-ctrl-post-buffer pmpio-ctrl-post-buffer-name t)
   )
 
+(defun pumpio-cancel-new-note ()
+  "Cancel the new note buffer created by `pumpio-new-note'"
+  (interactive)
+  (pmpio-ctrl-close-new-note)
+  )
+
+;;(defun pumpio-major-feed (&optional nickname)
+(defun pumpio-major-feed (nickname)
+  "Retrieve and show the major feed for the given user whose nick is NICKNAME."
+
+  ;; --> Soon: 
+  ;; If NICKNAME is nil or not setted, then the current user is used. "
+  ;; (interactive "MNickname?(defaults to current user)")
+  (interactive "MNickname?")
+  
+  (pmpio-ctrl-get-major-feed nickname)
+  )
+
+(global-set-key "\C-xpn" 'pumpio-new-note)
+(global-set-key "\C-xpf" 'pumpio-major-feed)
+
 ;;; pumpio-interface.el ends here

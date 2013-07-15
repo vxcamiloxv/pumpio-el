@@ -86,6 +86,7 @@ Ensure that this client is registered."
     (dolist (act activities)
       (pmpio-write-activity act)
       )
+    (goto-char (point-min))
     (switch-to-buffer-other-window (current-buffer))
     )		     
   )
@@ -135,7 +136,7 @@ If KILL-BUFFER is t, then the current buffer will be killed after the note is po
       (pmpio-post-note (make-pmpio-note :content (buffer-string)) 'pmpio-ctrl-post-callback)
       
       (when kill-buffer
-	(kill-buffer)
+	(pmpio-ctrl-close-new-note)
 	)
       )
     )
@@ -144,6 +145,16 @@ If KILL-BUFFER is t, then the current buffer will be killed after the note is po
 (defun pmpio-ctrl-post-callback (post-data)
   "This is a callback function for `pmpio-ctrl-post-current-buffer'."
   (message "Note posted! :-)")
+  )
+
+(defun pmpio-ctrl-close-new-note ()
+  "Hide and kill the new note buffer."
+  (when (get-buffer pmpio-ctrl-post-buffer-name)
+    (with-current-buffer pmpio-ctrl-post-buffer-name
+      (delete-window)
+      (kill-buffer (current-buffer))
+      )
+    )
   )
 
 ;;; pumpio-control.el ends here

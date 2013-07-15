@@ -40,6 +40,7 @@
     (define-key map "\es" 'center-line)
     (define-key map "\eS" 'center-paragraph)
     (define-key map "\C-c\C-c" 'pumpio-post-new-note)
+    (define-key map "\C-c\C-k" 'pumpio-cancel-new-note)
     map)
        "Keymap for `pumpio-post-mode'.")
 

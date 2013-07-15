@@ -32,16 +32,29 @@
 
 (provide 'pumpio-activity)
 
+(require 'pumpio-feed-mode) ;; We need some faces from this lib...
+
 (defstruct pmpio-activity
   verb actor content updated published)
 
+
 (defun pmpio-write-activity (activity)
   "Write in the current buffer a formatted ACTIVITY text."
-  (insert (format "\n%s at %s %s: \n%s\n" 
-		  (pmpio-activity-actor activity)
-		  (pmpio-activity-published activity)
-		  (pmpio-activity-verb activity)
-		  (pmpio-activity-content activity)))	  
+  (insert (propertize "\n" 'face 'pumpio-activity-bar-face)
+	  "\n"
+	  (propertize (format  "%s at %s %s:"
+			       (pmpio-activity-actor activity)
+			       (pmpio-activity-published activity)
+			       (pmpio-activity-verb activity))
+		      'face 'pumpio-header-face
+		      )
+	  "\n"
+	  (propertize (format "\n%s\n" 	  
+			      (pmpio-activity-content activity))
+		      'face 'pumpio-text-face
+		      )
+	  "\n"
+	  )
   )
 
 ;;; pumpio-activity.el ends here

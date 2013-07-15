@@ -36,6 +36,10 @@
 (require 'pumpio-note)
 (require 'pumpio-post-mode)
 
+(require 'pumpio-feed-mode)
+
+(require 'html2text) ;; Emacs 24 has this by default!
+
 
 (defconst pumpio-buffer "PumpIO"
   "This is the PumpIO Buffer name.
@@ -87,6 +91,7 @@ Ensure that this client is registered."
       (pmpio-write-activity act)
       )
     (goto-char (point-min))
+    (pmpio-apply-html-format)
     (switch-to-buffer-other-window (current-buffer))
     )		     
   )

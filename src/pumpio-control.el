@@ -87,6 +87,7 @@ Ensure that this client is registered."
   "Callback function for `pmpio-ctrl-get-major-feed'."
   (with-current-buffer (get-buffer-create pumpio-buffer)
     (delete-region (point-min) (point-max))
+    (setq activities (reverse activities))
     (dolist (act activities)
       (pmpio-write-activity act)
       )

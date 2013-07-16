@@ -139,6 +139,9 @@ If KILL-BUFFER is t, then the current buffer will be killed after the note is po
       )
     
     (with-current-buffer buffer
+      (goto-char (point-min))
+      (replace-regexp "^[[:blank:]]*[\n\r]" "<br/>\n")
+      
       (pmpio-post-note (make-pmpio-note :content (buffer-string)) 'pmpio-ctrl-post-callback)
       
       (when kill-buffer

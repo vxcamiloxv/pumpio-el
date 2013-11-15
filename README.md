@@ -18,6 +18,13 @@ I used the FLIM implementation and works well. Until I solve this problem, downl
 
 Please, erase or rename the hmac-sha1.el file that comes with emacs-OAuth, it won't work for connecting with pump.io.
 
+# Contact
+
+You can contact me at:
+
+* [identica](https://identi.ca/cnngimenez).
+* [ ![icon](https://joindiaspora.com/favicon.ico) diaspora](https://joindiaspora.com/people/4d23eaf32c174309a500522a)
+
 # License
 
 
